@@ -1,7 +1,28 @@
 
-let movimentacoes = JSON.parse(localStorage.getItem("movimentacoes")) || [];
+// ==========================================
+// CONFIGURAÇÃO DO SUPABASE
+// ==========================================
 
+const SUPABASE_URL = "https://fjuzjfxdjmyinbqnkuhl.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_79_WUIdnLm0rat6XB65kZA_0H-IPyei";
+
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY,
+    {
+        auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+        }
+    }
+);
+
+let movimentacoes = [];
 let financeiroAtual = "";
+let usuarioAtual = null;
+let usuarioCarregado = null;
 
 const filtroMes = document.getElementById("filtroMes");
 
@@ -12,10 +33,174 @@ filtroMes.value =
     String(hoje.getMonth() + 1).padStart(2, "0");
 
 document.getElementById("data").value =
-    hoje.toISOString().split("T")[0];
+    hoje.getFullYear() + "-" +
+    String(hoje.getMonth() + 1).padStart(2, "0") + "-" +
+    String(hoje.getDate()).padStart(2, "0");
 
 
+// ==========================================
+// LOGIN E AUTENTICAÇÃO
+// ==========================================
+
+async function entrar(event) {
+    event.preventDefault();
+
+    const email = document.getElementById("emailLogin").value.trim();
+    const senha = document.getElementById("senhaLogin").value;
+    const mensagem = document.getElementById("mensagemLogin");
+    const botao = document.getElementById("botaoLogin");
+
+    mensagem.textContent = "";
+    botao.disabled = true;
+    botao.textContent = "Entrando...";
+
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: senha
+        });
+
+        if (error) {
+            console.error("Erro no login:", error);
+            mensagem.textContent = error.message;
+            botao.disabled = false;
+            botao.textContent = "Entrar";
+            return;
+        }
+
+        if (data.session) {
+            await iniciarSistema(data.session);
+        }
+
+    } catch (erro) {
+        console.error("Erro inesperado no login:", erro);
+        mensagem.textContent = "Erro de conexão. Tente novamente.";
+        botao.disabled = false;
+        botao.textContent = "Entrar";
+    }
+}
+
+
+async function sair() {
+    const confirmar = confirm("Deseja realmente sair da sua conta?");
+
+    if (!confirmar) return;
+
+    const { error } = await supabaseClient.auth.signOut();
+
+    if (error) {
+        console.error("Erro ao sair:", error);
+        alert("Não foi possível sair. Tente novamente.");
+    }
+}
+
+
+function mostrarLogin() {
+    document.getElementById("telaLogin").style.display = "block";
+    document.getElementById("appContainer").style.display = "none";
+
+    document.getElementById("botaoLogin").disabled = false;
+    document.getElementById("botaoLogin").textContent = "Entrar";
+
+    usuarioAtual = null;
+    usuarioCarregado = null;
+    movimentacoes = [];
+    financeiroAtual = "";
+}
+
+
+async function iniciarSistema(session) {
+    if (!session || !session.user) {
+        mostrarLogin();
+        return;
+    }
+
+    usuarioAtual = session.user;
+
+    if (usuarioCarregado === usuarioAtual.id) {
+        document.getElementById("telaLogin").style.display = "none";
+        document.getElementById("appContainer").style.display = "block";
+        return;
+    }
+
+    const mensagem = document.getElementById("mensagemLogin");
+
+    try {
+        mensagem.textContent = "Carregando suas finanças...";
+
+        const { data, error } = await supabaseClient
+            .from("movimentacoes")
+            .select("*")
+            .order("data", { ascending: false });
+
+        if (error) {
+            console.error("Erro ao carregar movimentações:", error);
+            mensagem.textContent = "Erro ao carregar os dados: " + error.message;
+            return;
+        }
+
+        movimentacoes = data.map(item => ({
+            ...item,
+            valor: Number(item.valor)
+        }));
+
+        usuarioCarregado = usuarioAtual.id;
+
+        document.getElementById("telaLogin").style.display = "none";
+        document.getElementById("appContainer").style.display = "block";
+
+        document.getElementById("usuarioLogado").textContent =
+            usuarioAtual.email;
+
+        atualizarCategorias();
+        atualizarDashboard();
+
+        if (financeiroAtual) {
+            atualizarFinanceiro();
+        }
+
+    } catch (erro) {
+        console.error("Erro ao iniciar sistema:", erro);
+        mensagem.textContent = "Não foi possível carregar suas finanças.";
+    }
+}
+
+
+// Detectar automaticamente quando o usuário entra ou sai
+
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (session) {
+        if (event !== "SIGNED_IN") {
+            queueMicrotask(() => iniciarSistema(session));
+        }
+    } else {
+        mostrarLogin();
+    }
+});
+
+
+// Verificar sessão existente ao abrir a página
+
+async function verificarSessao() {
+    const { data, error } = await supabaseClient.auth.getSession();
+
+    if (error) {
+        console.error("Erro ao verificar sessão:", error);
+        mostrarLogin();
+        return;
+    }
+
+    if (data.session) {
+        await iniciarSistema(data.session);
+    } else {
+        mostrarLogin();
+    }
+}
+
+
+// ==========================================
 // CATEGORIAS
+// ==========================================
 
 const categoriasGastos = [
     "Alimentação",
@@ -51,16 +236,16 @@ function atualizarCategorias() {
 
     categorias.forEach(categoria => {
         const opcao = document.createElement("option");
-
         opcao.value = categoria;
         opcao.textContent = categoria;
-
         campoCategoria.appendChild(opcao);
     });
 }
 
 
-// FORMATAÇÃO DE VALORES
+// ==========================================
+// FORMATAÇÃO
+// ==========================================
 
 function formatarDinheiro(valor) {
     return Number(valor).toLocaleString("pt-BR", {
@@ -70,17 +255,9 @@ function formatarDinheiro(valor) {
 }
 
 
-// SALVAR DADOS
-
-function salvarDados() {
-    localStorage.setItem(
-        "movimentacoes",
-        JSON.stringify(movimentacoes)
-    );
-}
-
-
+// ==========================================
 // FILTRAR MOVIMENTAÇÕES DO MÊS
+// ==========================================
 
 function movimentacoesDoMes(lista) {
     return lista.filter(item =>
@@ -89,7 +266,9 @@ function movimentacoesDoMes(lista) {
 }
 
 
+// ==========================================
 // CALCULAR RESUMO
+// ==========================================
 
 function calcularResumo(lista) {
     let entradas = 0;
@@ -97,9 +276,9 @@ function calcularResumo(lista) {
 
     lista.forEach(item => {
         if (item.tipo === "entrada") {
-            entradas += item.valor;
+            entradas += Number(item.valor);
         } else {
-            gastos += item.valor;
+            gastos += Number(item.valor);
         }
     });
 
@@ -111,26 +290,26 @@ function calcularResumo(lista) {
 }
 
 
+// ==========================================
 // ATUALIZAR CORES DO SALDO
+// ==========================================
 
 function atualizarSaldo(id, valor) {
     const elemento = document.getElementById(id);
 
     elemento.textContent = formatarDinheiro(valor);
 
-    if (valor < 0) {
-        elemento.style.color = "#e74c3c";
-    } else {
-        elemento.style.color = "#27ae60";
-    }
+    elemento.style.color =
+        valor < 0 ? "#e74c3c" : "#27ae60";
 }
 
 
-// ATUALIZAR PAINEL PRINCIPAL
+// ==========================================
+// PAINEL PRINCIPAL
+// ==========================================
 
 function atualizarDashboard() {
     const lista = movimentacoesDoMes(movimentacoes);
-
     const resumo = calcularResumo(lista);
 
     document.getElementById("totalEntradas").textContent =
@@ -157,7 +336,9 @@ function atualizarDashboard() {
 }
 
 
-// ABRIR FINANCEIRO
+// ==========================================
+// ABRIR E FECHAR FINANCEIRO
+// ==========================================
 
 function abrirFinanceiro(area) {
     financeiroAtual = area;
@@ -166,13 +347,13 @@ function abrirFinanceiro(area) {
     document.getElementById("telaFinanceiro").style.display = "block";
 
     document.getElementById("tituloFinanceiro").textContent =
-        area === "empresa" ? "Financeiro da Empresa" : "Financeiro do João";
+        area === "empresa"
+            ? "Financeiro da Empresa"
+            : "Financeiro do João";
 
     atualizarFinanceiro();
 }
 
-
-// VOLTAR AO INÍCIO
 
 function voltarInicio() {
     document.getElementById("dashboard").style.display = "block";
@@ -184,9 +365,21 @@ function voltarInicio() {
 }
 
 
-// ADICIONAR MOVIMENTAÇÃO
+// ==========================================
+// ADICIONAR MOVIMENTAÇÃO NA NUVEM
+// ==========================================
 
-function adicionarMovimentacao() {
+async function adicionarMovimentacao() {
+    if (!usuarioAtual) {
+        alert("Faça login novamente.");
+        return;
+    }
+
+    if (!financeiroAtual) {
+        alert("Selecione Empresa ou João primeiro.");
+        return;
+    }
+
     const tipo = document.getElementById("tipo").value;
     const categoria = document.getElementById("categoria").value;
     const descricao = document.getElementById("descricao").value.trim();
@@ -210,6 +403,7 @@ function adicionarMovimentacao() {
 
     const novaMovimentacao = {
         id: crypto.randomUUID(),
+        user_id: usuarioAtual.id,
         area: financeiroAtual,
         tipo: tipo,
         categoria: categoria,
@@ -218,21 +412,44 @@ function adicionarMovimentacao() {
         data: data
     };
 
-    movimentacoes.push(novaMovimentacao);
+    try {
+        const { data: registro, error } = await supabaseClient
+            .from("movimentacoes")
+            .insert([novaMovimentacao])
+            .select()
+            .single();
 
-    salvarDados();
+        if (error) {
+            console.error("Erro ao salvar:", error);
+            alert("Não foi possível salvar: " + error.message);
+            return;
+        }
 
-    document.getElementById("descricao").value = "";
-    document.getElementById("valor").value = "";
+        movimentacoes.push({
+            ...registro,
+            valor: Number(registro.valor)
+        });
 
-    atualizarDashboard();
-    atualizarFinanceiro();
+        document.getElementById("descricao").value = "";
+        document.getElementById("valor").value = "";
+
+        atualizarDashboard();
+        atualizarFinanceiro();
+
+        alert("Movimentação salva com sucesso!");
+
+    } catch (erro) {
+        console.error("Erro inesperado ao salvar:", erro);
+        alert("Erro de conexão ao salvar. Tente novamente.");
+    }
 }
 
 
-// EDITAR MOVIMENTAÇÃO
+// ==========================================
+// EDITAR MOVIMENTAÇÃO NA NUVEM
+// ==========================================
 
-function editarMovimentacao(id) {
+async function editarMovimentacao(id) {
     const item = movimentacoes.find(m => m.id === id);
 
     if (!item) return;
@@ -262,35 +479,72 @@ function editarMovimentacao(id) {
         return;
     }
 
-    item.descricao = novaDescricao.trim();
-    item.valor = valorConvertido;
+    try {
+        const { error } = await supabaseClient
+            .from("movimentacoes")
+            .update({
+                descricao: novaDescricao.trim(),
+                valor: valorConvertido
+            })
+            .eq("id", id);
 
-    salvarDados();
+        if (error) {
+            console.error("Erro ao editar:", error);
+            alert("Não foi possível editar: " + error.message);
+            return;
+        }
 
-    atualizarDashboard();
-    atualizarFinanceiro();
+        item.descricao = novaDescricao.trim();
+        item.valor = valorConvertido;
+
+        atualizarDashboard();
+        atualizarFinanceiro();
+
+    } catch (erro) {
+        console.error("Erro inesperado ao editar:", erro);
+        alert("Erro de conexão ao editar.");
+    }
 }
 
 
-// EXCLUIR MOVIMENTAÇÃO
+// ==========================================
+// EXCLUIR MOVIMENTAÇÃO NA NUVEM
+// ==========================================
 
-function excluirMovimentacao(id) {
+async function excluirMovimentacao(id) {
     const confirmar = confirm(
         "Deseja realmente excluir esta movimentação?"
     );
 
     if (!confirmar) return;
 
-    movimentacoes = movimentacoes.filter(item => item.id !== id);
+    try {
+        const { error } = await supabaseClient
+            .from("movimentacoes")
+            .delete()
+            .eq("id", id);
 
-    salvarDados();
+        if (error) {
+            console.error("Erro ao excluir:", error);
+            alert("Não foi possível excluir: " + error.message);
+            return;
+        }
 
-    atualizarDashboard();
-    atualizarFinanceiro();
+        movimentacoes = movimentacoes.filter(item => item.id !== id);
+
+        atualizarDashboard();
+        atualizarFinanceiro();
+
+    } catch (erro) {
+        console.error("Erro inesperado ao excluir:", erro);
+        alert("Erro de conexão ao excluir.");
+    }
 }
 
 
-// ATUALIZAR GRÁFICO DE CATEGORIAS
+// ==========================================
+// GRÁFICO DE CATEGORIAS
+// ==========================================
 
 function atualizarGrafico(lista) {
     const grafico = document.getElementById("graficoCategorias");
@@ -313,14 +567,14 @@ function atualizarGrafico(lista) {
             totais[categoria] = 0;
         }
 
-        totais[categoria] += item.valor;
+        totais[categoria] += Number(item.valor);
     });
 
     const categoriasOrdenadas = Object.entries(totais)
         .sort((a, b) => b[1] - a[1]);
 
     const totalGastos = gastos.reduce(
-        (total, item) => total + item.valor,
+        (total, item) => total + Number(item.valor),
         0
     );
 
@@ -363,7 +617,9 @@ function atualizarGrafico(lista) {
 }
 
 
+// ==========================================
 // ATUALIZAR TELA FINANCEIRA
+// ==========================================
 
 function atualizarFinanceiro() {
     const lista = movimentacoesDoMes(movimentacoes)
@@ -445,7 +701,9 @@ function atualizarFinanceiro() {
 }
 
 
+// ==========================================
 // FILTRO DE MÊS
+// ==========================================
 
 filtroMes.addEventListener("change", () => {
     atualizarDashboard();
@@ -462,7 +720,9 @@ filtroMes.addEventListener("change", () => {
 });
 
 
+// ==========================================
 // EXPORTAR BACKUP
+// ==========================================
 
 function exportarBackup() {
     const backup = {
@@ -492,16 +752,18 @@ function exportarBackup() {
 }
 
 
-// IMPORTAR BACKUP
+// ==========================================
+// IMPORTAR BACKUP PARA A NUVEM
+// ==========================================
 
-function importarBackup(event) {
+async function importarBackup(event) {
     const arquivo = event.target.files[0];
 
     if (!arquivo) return;
 
     const leitor = new FileReader();
 
-    leitor.onload = function(e) {
+    leitor.onload = async function(e) {
         try {
             const backup = JSON.parse(e.target.result);
 
@@ -532,14 +794,45 @@ function importarBackup(event) {
             }
 
             const confirmar = confirm(
-                "Restaurar este backup substituirá todos os lançamentos atuais. Deseja continuar?"
+                "Restaurar este backup substituirá todos os lançamentos atuais da sua conta. Deseja continuar?"
             );
 
             if (!confirmar) return;
 
-            movimentacoes = backup.movimentacoes;
+            const registros = backup.movimentacoes.map(item => ({
+                id: item.id,
+                user_id: usuarioAtual.id,
+                area: item.area,
+                tipo: item.tipo,
+                categoria: item.categoria || "Outros",
+                descricao: item.descricao.trim(),
+                valor: item.valor,
+                data: item.data
+            }));
 
-            salvarDados();
+            const { error: erroExclusao } = await supabaseClient
+                .from("movimentacoes")
+                .delete()
+                .eq("user_id", usuarioAtual.id);
+
+            if (erroExclusao) {
+                throw erroExclusao;
+            }
+
+            if (registros.length > 0) {
+                const { error: erroInsercao } = await supabaseClient
+                    .from("movimentacoes")
+                    .insert(registros);
+
+                if (erroInsercao) {
+                    throw erroInsercao;
+                }
+            }
+
+            movimentacoes = registros.map(item => ({
+                ...item,
+                valor: Number(item.valor)
+            }));
 
             atualizarDashboard();
 
@@ -550,7 +843,8 @@ function importarBackup(event) {
             alert("Backup restaurado com sucesso!");
 
         } catch (erro) {
-            alert("Não foi possível restaurar o backup. Verifique o arquivo.");
+            console.error("Erro ao restaurar backup:", erro);
+            alert("Não foi possível restaurar o backup: " + erro.message);
         } finally {
             event.target.value = "";
         }
@@ -565,21 +859,14 @@ function importarBackup(event) {
 }
 
 
-// INICIALIZAÇÃO
-
-atualizarCategorias();
-atualizarDashboard();
-
-
-// ===== RELATÓRIO MENSAL =====
+// ==========================================
+// RELATÓRIO MENSAL
+// ==========================================
 
 function atualizarRelatorioMensal() {
-
     const mesSelecionado = filtroMes.value;
 
     if (!mesSelecionado) return;
-
-    // Resultado da Empresa
 
     const listaEmpresa = movimentacoesDoMes(movimentacoes)
         .filter(item => item.area === "empresa");
@@ -589,9 +876,6 @@ function atualizarRelatorioMensal() {
     document.getElementById("resultadoEmpresa").textContent =
         formatarDinheiro(resumoEmpresa.saldo);
 
-
-    // Resultado do João
-
     const listaJoao = movimentacoesDoMes(movimentacoes)
         .filter(item => item.area === "joao");
 
@@ -599,9 +883,6 @@ function atualizarRelatorioMensal() {
 
     document.getElementById("resultadoJoao").textContent =
         formatarDinheiro(resumoJoao.saldo);
-
-
-    // Resultado do mês anterior
 
     const [ano, mes] = mesSelecionado.split("-").map(Number);
 
@@ -624,24 +905,19 @@ function atualizarRelatorioMensal() {
     document.getElementById("resultadoAnterior").textContent =
         formatarDinheiro(resumoAnterior.saldo);
 
-
-    // Maior categoria de gastos
-
     const gastos = movimentacoesDoMes(movimentacoes)
         .filter(item => item.tipo === "gasto");
 
     const totaisCategorias = {};
 
     gastos.forEach(item => {
-
         const categoria = item.categoria || "Sem categoria";
 
         if (!totaisCategorias[categoria]) {
             totaisCategorias[categoria] = 0;
         }
 
-        totaisCategorias[categoria] += item.valor;
-
+        totaisCategorias[categoria] += Number(item.valor);
     });
 
     const categoriasOrdenadas = Object.entries(totaisCategorias)
@@ -651,24 +927,20 @@ function atualizarRelatorioMensal() {
         document.getElementById("maiorCategoria");
 
     if (categoriasOrdenadas.length > 0) {
-
         campoMaiorCategoria.textContent =
             categoriasOrdenadas[0][0] + " - " +
             formatarDinheiro(categoriasOrdenadas[0][1]);
-
     } else {
-
         campoMaiorCategoria.textContent = "Nenhuma";
-
     }
-
 }
 
 
-// ===== GRÁFICO DE EVOLUÇÃO =====
+// ==========================================
+// GRÁFICO DE EVOLUÇÃO
+// ==========================================
 
 function atualizarGraficoEvolucao() {
-
     const grafico = document.getElementById("graficoEvolucao");
 
     if (!grafico) return;
@@ -679,10 +951,7 @@ function atualizarGraficoEvolucao() {
 
     const meses = [];
 
-    // Buscar os últimos 6 meses, incluindo o selecionado
-
     for (let i = 5; i >= 0; i--) {
-
         const data = new Date(ano, mes - 1 - i, 1);
 
         const anoMes =
@@ -713,7 +982,6 @@ function atualizarGraficoEvolucao() {
     );
 
     meses.forEach(mes => {
-
         const linha = document.createElement("div");
         linha.className = "mes-grafico";
 
@@ -749,7 +1017,13 @@ function atualizarGraficoEvolucao() {
         linha.appendChild(valores);
 
         grafico.appendChild(linha);
-
     });
-
 }
+
+
+// ==========================================
+// INICIALIZAÇÃO
+// ==========================================
+
+atualizarCategorias();
+verificarSessao();

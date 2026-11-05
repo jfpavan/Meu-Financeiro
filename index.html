@@ -16,228 +16,272 @@
 
     <main>
 
-        <!-- PAINEL PRINCIPAL -->
-        <section id="dashboard">
+        <!-- TELA DE LOGIN -->
+        <section id="telaLogin" class="tela-login">
 
-            <h2>Visão geral</h2>
+            <h2>Acesse sua conta</h2>
+            <p>Entre para acessar suas finanças.</p>
 
-            <div class="resumo">
-                <div class="card-resumo">
-                    <h3>Entradas</h3>
-                    <p id="totalEntradas">R$ 0,00</p>
-                </div>
+            <form onsubmit="entrar(event)">
 
-                <div class="card-resumo">
-                    <h3>Gastos</h3>
-                    <p id="totalGastos">R$ 0,00</p>
-                </div>
-
-                <div class="card-resumo">
-                    <h3>Saldo</h3>
-                    <p id="saldoTotal">R$ 0,00</p>
-                </div>
-            </div>
-
-            <div class="mes">
-                <label for="filtroMes">Consultar mês:</label>
-                <input type="month" id="filtroMes">
-            </div>
-
-            <h2>Minhas finanças</h2>
-
-            <div class="financeiros">
-
-                <div class="card-financeiro" onclick="abrirFinanceiro('empresa')">
-                    <h3>Empresa</h3>
-                    <p>Pavan</p>
-                    <strong id="saldoEmpresa">R$ 0,00</strong>
-                </div>
-
-                <div class="card-financeiro" onclick="abrirFinanceiro('joao')">
-                    <h3>João</h3>
-                    <p>Finanças pessoais</p>
-                    <strong id="saldoJoao">R$ 0,00</strong>
-                </div>
-
-<!-- RELATÓRIO MENSAL -->
-
-<section class="relatorio-mensal">
-
-    <h2>Relatório mensal</h2>
-
-    <p class="descricao-relatorio">
-        Acompanhe o desempenho das suas finanças.
-    </p>
-
-    <div class="cards-relatorio">
-
-        <div class="card-relatorio">
-            <span>Resultado da Empresa</span>
-            <strong id="resultadoEmpresa">R$ 0,00</strong>
-        </div>
-
-        <div class="card-relatorio">
-            <span>Resultado do João</span>
-            <strong id="resultadoJoao">R$ 0,00</strong>
-        </div>
-
-        <div class="card-relatorio">
-            <span>Resultado do mês anterior</span>
-            <strong id="resultadoAnterior">R$ 0,00</strong>
-        </div>
-
-        <div class="card-relatorio">
-            <span>Maior categoria de gastos</span>
-            <strong id="maiorCategoria">Nenhuma</strong>
-        </div>
-
-    </div>
-
-    
-
-    
-<!-- EVOLUÇÃO FINANCEIRA -->
-
-<section class="evolucao">
-
-    <h2>Evolução dos últimos 6 meses</h2>
-
-    <p class="descricao-relatorio">
-        Compare suas entradas e gastos mês a mês.
-    </p>
-
-    <div class="legenda-grafico">
-        <span><i class="legenda-entrada"></i> Entradas</span>
-        <span><i class="legenda-gasto"></i> Gastos</span>
-    </div>
-
-    <div id="graficoEvolucao"></div>
-
-</section>
-
-</section>
-
-            </div>
-
-            <!-- BACKUP -->
-            <div class="backup">
-                <h2>Segurança dos dados</h2>
-                <p>Faça uma cópia dos seus dados ou restaure um backup anterior.</p>
-
-                <div class="backup-botoes">
-                    <button class="botao-backup" onclick="exportarBackup()">
-                        ↓ Baixar backup
-                    </button>
-
-                    <button class="botao-restaurar" onclick="document.getElementById('arquivoBackup').click()">
-                        ↑ Restaurar backup
-                    </button>
-
-                    <input
-                        type="file"
-                        id="arquivoBackup"
-                        accept=".json,application/json"
-                        hidden
-                        onchange="importarBackup(event)"
-                    >
-                </div>
-            </div>
-
-        </section>
-
-
-        <!-- TELA FINANCEIRA -->
-        <section id="telaFinanceiro" style="display: none;">
-
-            <button class="botao-voltar" onclick="voltarInicio()">
-                ← Voltar
-            </button>
-
-            <h2 id="tituloFinanceiro">Financeiro</h2>
-
-            <div class="resumo">
-
-                <div class="card-resumo">
-                    <h3>Entradas</h3>
-                    <p id="entradasArea">R$ 0,00</p>
-                </div>
-
-                <div class="card-resumo">
-                    <h3>Gastos</h3>
-                    <p id="gastosArea">R$ 0,00</p>
-                </div>
-
-                <div class="card-resumo">
-                    <h3>Saldo</h3>
-                    <p id="saldoArea">R$ 0,00</p>
-                </div>
-
-            </div>
-
-
-            <!-- GRÁFICO DE CATEGORIAS -->
-            <div class="relatorio">
-                <h3>Gastos por categoria</h3>
-                <div id="graficoCategorias">
-                    <p>Nenhum gasto registrado neste mês.</p>
-                </div>
-            </div>
-
-
-            <!-- FORMULÁRIO DE LANÇAMENTO -->
-            <div class="formulario">
-
-                <h3>Novo lançamento</h3>
-
-                <label for="tipo">Tipo de lançamento</label>
-                <select id="tipo" onchange="atualizarCategorias()">
-                    <option value="gasto">Gasto</option>
-                    <option value="entrada">Entrada</option>
-                </select>
-
-                <label for="categoria">Categoria</label>
-                <select id="categoria">
-                    <option value="Outros">Outros</option>
-                </select>
-
-                <label for="descricao">Descrição</label>
+                <label for="emailLogin">E-mail</label>
                 <input
-                    type="text"
-                    id="descricao"
-                    placeholder="Ex: Conta de energia"
+                    type="email"
+                    id="emailLogin"
+                    placeholder="Seu e-mail"
+                    required
                 >
 
-                <label for="valor">Valor (R$)</label>
+                <label for="senhaLogin">Senha</label>
                 <input
-                    type="number"
-                    id="valor"
-                    placeholder="Ex: 150,00"
-                    step="0.01"
-                    min="0"
+                    type="password"
+                    id="senhaLogin"
+                    placeholder="Sua senha"
+                    required
                 >
 
-                <label for="data">Data</label>
-                <input type="date" id="data">
-
-                <button onclick="adicionarMovimentacao()">
-                    Adicionar lançamento
+                <button type="submit" id="botaoLogin">
+                    Entrar
                 </button>
 
-            </div>
+                <p id="mensagemLogin"></p>
 
-
-            <!-- HISTÓRICO -->
-            <div class="historico">
-
-                <h3>Histórico de movimentações</h3>
-
-                <div id="listaMovimentacoes">
-                    <p>Nenhuma movimentação registrada.</p>
-                </div>
-
-            </div>
+            </form>
 
         </section>
+
+
+        <!-- SISTEMA FINANCEIRO -->
+        <div id="appContainer" style="display: none;">
+
+            <div class="area-usuario">
+                <span id="usuarioLogado"></span>
+                <button onclick="sair()" class="botao-sair">
+                    Sair
+                </button>
+            </div>
+
+            <!-- PAINEL PRINCIPAL -->
+            <section id="dashboard">
+
+                <h2>Visão geral</h2>
+
+                <div class="resumo">
+                    <div class="card-resumo">
+                        <h3>Entradas</h3>
+                        <p id="totalEntradas">R$ 0,00</p>
+                    </div>
+
+                    <div class="card-resumo">
+                        <h3>Gastos</h3>
+                        <p id="totalGastos">R$ 0,00</p>
+                    </div>
+
+                    <div class="card-resumo">
+                        <h3>Saldo</h3>
+                        <p id="saldoTotal">R$ 0,00</p>
+                    </div>
+                </div>
+
+                <div class="mes">
+                    <label for="filtroMes">Consultar mês:</label>
+                    <input type="month" id="filtroMes">
+                </div>
+
+                <h2>Minhas finanças</h2>
+
+                <div class="financeiros">
+
+                    <div class="card-financeiro" onclick="abrirFinanceiro('empresa')">
+                        <h3>Empresa</h3>
+                        <p>DRP Corretora</p>
+                        <strong id="saldoEmpresa">R$ 0,00</strong>
+                    </div>
+
+                    <div class="card-financeiro" onclick="abrirFinanceiro('joao')">
+                        <h3>João</h3>
+                        <p>Finanças pessoais</p>
+                        <strong id="saldoJoao">R$ 0,00</strong>
+                    </div>
+
+                </div>
+
+                <!-- RELATÓRIO MENSAL -->
+                <section class="relatorio-mensal">
+
+                    <h2>Relatório mensal</h2>
+
+                    <p class="descricao-relatorio">
+                        Acompanhe o desempenho das suas finanças.
+                    </p>
+
+                    <div class="cards-relatorio">
+
+                        <div class="card-relatorio">
+                            <span>Resultado da Empresa</span>
+                            <strong id="resultadoEmpresa">R$ 0,00</strong>
+                        </div>
+
+                        <div class="card-relatorio">
+                            <span>Resultado do João</span>
+                            <strong id="resultadoJoao">R$ 0,00</strong>
+                        </div>
+
+                        <div class="card-relatorio">
+                            <span>Resultado do mês anterior</span>
+                            <strong id="resultadoAnterior">R$ 0,00</strong>
+                        </div>
+
+                        <div class="card-relatorio">
+                            <span>Maior categoria de gastos</span>
+                            <strong id="maiorCategoria">Nenhuma</strong>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- EVOLUÇÃO FINANCEIRA -->
+                <section class="evolucao">
+
+                    <h2>Evolução dos últimos 6 meses</h2>
+
+                    <p class="descricao-relatorio">
+                        Compare suas entradas e gastos mês a mês.
+                    </p>
+
+                    <div class="legenda-grafico">
+                        <span><i class="legenda-entrada"></i> Entradas</span>
+                        <span><i class="legenda-gasto"></i> Gastos</span>
+                    </div>
+
+                    <div id="graficoEvolucao"></div>
+
+                </section>
+
+                <!-- BACKUP -->
+                <div class="backup">
+
+                    <h2>Segurança dos dados</h2>
+
+                    <p>Faça uma cópia dos seus dados ou restaure um backup anterior.</p>
+
+                    <div class="backup-botoes">
+
+                        <button class="botao-backup" onclick="exportarBackup()">
+                            ↓ Baixar backup
+                        </button>
+
+                        <button class="botao-restaurar" onclick="document.getElementById('arquivoBackup').click()">
+                            ↑ Restaurar backup
+                        </button>
+
+                        <input
+                            type="file"
+                            id="arquivoBackup"
+                            accept=".json,application/json"
+                            hidden
+                            onchange="importarBackup(event)"
+                        >
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- TELA FINANCEIRA -->
+            <section id="telaFinanceiro" style="display: none;">
+
+                <button class="botao-voltar" onclick="voltarInicio()">
+                    ← Voltar
+                </button>
+
+                <h2 id="tituloFinanceiro">Financeiro</h2>
+
+                <div class="resumo">
+
+                    <div class="card-resumo">
+                        <h3>Entradas</h3>
+                        <p id="entradasArea">R$ 0,00</p>
+                    </div>
+
+                    <div class="card-resumo">
+                        <h3>Gastos</h3>
+                        <p id="gastosArea">R$ 0,00</p>
+                    </div>
+
+                    <div class="card-resumo">
+                        <h3>Saldo</h3>
+                        <p id="saldoArea">R$ 0,00</p>
+                    </div>
+
+                </div>
+
+                <!-- GRÁFICO DE CATEGORIAS -->
+                <div class="relatorio">
+                    <h3>Gastos por categoria</h3>
+                    <div id="graficoCategorias">
+                        <p>Nenhum gasto registrado neste mês.</p>
+                    </div>
+                </div>
+
+                <!-- FORMULÁRIO DE LANÇAMENTO -->
+                <div class="formulario">
+
+                    <h3>Novo lançamento</h3>
+
+                    <label for="tipo">Tipo de lançamento</label>
+                    <select id="tipo" onchange="atualizarCategorias()">
+                        <option value="gasto">Gasto</option>
+                        <option value="entrada">Entrada</option>
+                    </select>
+
+                    <label for="categoria">Categoria</label>
+                    <select id="categoria">
+                        <option value="Outros">Outros</option>
+                    </select>
+
+                    <label for="descricao">Descrição</label>
+                    <input
+                        type="text"
+                        id="descricao"
+                        placeholder="Ex: Conta de energia"
+                    >
+
+                    <label for="valor">Valor (R$)</label>
+                    <input
+                        type="number"
+                        id="valor"
+                        placeholder="Ex: 150,00"
+                        step="0.01"
+                        min="0"
+                    >
+
+                    <label for="data">Data</label>
+                    <input type="date" id="data">
+
+                    <button onclick="adicionarMovimentacao()">
+                        Adicionar lançamento
+                    </button>
+
+                </div>
+
+                <!-- HISTÓRICO -->
+                <div class="historico">
+
+                    <h3>Histórico de movimentações</h3>
+
+                    <div id="listaMovimentacoes">
+                        <p>Nenhuma movimentação registrada.</p>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
 
     </main>
 
@@ -245,6 +289,10 @@
         <p>Meu Financeiro © 2026</p>
     </footer>
 
+    <!-- BIBLIOTECA SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- CÓDIGO DO SISTEMA -->
     <script src="script.js"></script>
 
 </body>
