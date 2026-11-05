@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -16,60 +15,39 @@
 
     <main>
 
-       
-<!-- TELA DE LOGIN -->
-<section id="telaLogin" class="tela-login">
+        <!-- TELA DE LOGIN -->
+        <section id="telaLogin" class="tela-login">
 
-    <div class="login-marca">
-        <div class="login-icone">₽</div>
-        <span>FINANCEIRO <strong>PAVAN</strong></span>
-    </div>
+            <h2>Acesse sua conta</h2>
+            <p>Entre para acessar suas finanças.</p>
 
-    <div class="login-conteudo">
+            <form onsubmit="entrar(event)">
 
-        <span class="login-etiqueta">GESTÃO FINANCEIRA</span>
+                <label for="emailLogin">E-mail</label>
+                <input
+                    type="email"
+                    id="emailLogin"
+                    placeholder="Seu e-mail"
+                    required
+                >
 
-        <h2>Bem-vindo ao<br><strong>Financeiro PAVAN</strong></h2>
+                <label for="senhaLogin">Senha</label>
+                <input
+                    type="password"
+                    id="senhaLogin"
+                    placeholder="Sua senha"
+                    required
+                >
 
-        <p class="login-descricao">
-            Seu dinheiro organizado, suas decisões mais inteligentes.
-        </p>
+                <button type="submit" id="botaoLogin">
+                    Entrar
+                </button>
 
-        <form onsubmit="entrar(event)">
+                <p id="mensagemLogin"></p>
 
-            <label for="emailLogin">E-mail</label>
-            <input
-                type="email"
-                id="emailLogin"
-                placeholder="Digite seu e-mail"
-                required
-            >
+            </form>
 
-            <label for="senhaLogin">Senha</label>
-            <input
-                type="password"
-                id="senhaLogin"
-                placeholder="Digite sua senha"
-                required
-            >
-
-            <button type="submit" id="botaoLogin">
-                Entrar na minha conta
-            </button>
-
-            <p id="mensagemLogin"></p>
-
-        </form>
-
-    </div>
-
-    <div class="login-rodape">
-        <span>ACESSO SEGURO</span>
-        <span>FINANCEIRO PAVAN © 2026</span>
-    </div>
-
-</section>
-
+        </section>
 
 
         <!-- SISTEMA FINANCEIRO -->
