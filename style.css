@@ -1,0 +1,568 @@
+
+/* CONFIGURAÇÕES GERAIS */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #222;
+    padding: 30px 20px;
+}
+
+main {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+header {
+    max-width: 1100px;
+    margin: 0 auto 35px;
+}
+
+header h1 {
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+header p {
+    color: #777;
+    font-size: 14px;
+}
+
+h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+h3 {
+    font-size: 17px;
+}
+
+
+/* FILTRO DE MÊS */
+
+.mes {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 35px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 250px;
+    border: 1px solid #eee;
+}
+
+.mes label {
+    color: #777;
+    font-size: 13px;
+}
+
+.mes input {
+    border: 1px solid #ddd;
+    background: white;
+    padding: 10px;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+
+/* RESUMO FINANCEIRO */
+
+.resumo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 35px;
+}
+
+.card-resumo {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #00000008;
+}
+
+.card-resumo h3 {
+    color: #777;
+    font-size: 14px;
+    font-weight: normal;
+    margin-bottom: 15px;
+}
+
+.card-resumo p {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+
+/* CARDS EMPRESA E JOÃO */
+
+.financeiros {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card-financeiro {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #00000008;
+    cursor: pointer;
+    transition: 0.2s;
+    border-top: 4px solid #3984d6;
+}
+
+.card-financeiro:nth-child(2) {
+    border-top-color: #16a36a;
+}
+
+.card-financeiro:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 5px 15px #00000012;
+}
+
+.card-financeiro h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.card-financeiro p {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.card-financeiro strong {
+    font-size: 24px;
+}
+
+
+/* BACKUP */
+
+.backup {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-top: 30px;
+    box-shadow: 0 2px 8px #00000008;
+}
+
+.backup h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.backup p {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.backup-botoes {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.botao-backup,
+.botao-restaurar {
+    border: none;
+    padding: 13px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.botao-backup {
+    background: #3984d6;
+    color: white;
+}
+
+.botao-restaurar {
+    background: #eaf2fc;
+    color: #3984d6;
+}
+
+.backup button:hover {
+    opacity: 0.85;
+}
+
+
+/* TELA FINANCEIRA */
+
+#telaFinanceiro {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+#tituloFinanceiro {
+    font-size: 27px;
+    margin-bottom: 25px;
+}
+
+.botao-voltar {
+    border: none;
+    background: #eaf2fc;
+    color: #3984d6;
+    padding: 10px 16px;
+    border-radius: 7px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+
+/* GRÁFICO DE CATEGORIAS */
+
+.relatorio {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 25px 0;
+    box-shadow: 0 2px 8px #00000008;
+}
+
+.relatorio h3 {
+    margin-bottom: 25px;
+}
+
+.linha-categoria {
+    margin-bottom: 20px;
+}
+
+.info-categoria {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.barra-fundo {
+    width: 100%;
+    height: 10px;
+    background: #eeeeee;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.barra-progresso {
+    height: 100%;
+    background: #3984d6;
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+
+.linha-categoria small {
+    display: block;
+    color: #777;
+    margin-top: 6px;
+}
+
+
+/* FORMULÁRIO */
+
+.formulario {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 25px 0;
+    box-shadow: 0 2px 8px #00000008;
+}
+
+.formulario h3 {
+    margin-bottom: 20px;
+}
+
+.formulario label {
+    display: block;
+    margin: 15px 0 7px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+}
+
+.formulario input,
+.formulario select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    font-size: 14px;
+    background: white;
+    outline: none;
+}
+
+.formulario input:focus,
+.formulario select:focus {
+    border-color: #3984d6;
+}
+
+.formulario button {
+    width: 100%;
+    margin-top: 22px;
+    padding: 14px;
+    background: #3984d6;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.formulario button:hover {
+    background: #246bb8;
+}
+
+
+/* HISTÓRICO */
+
+.historico {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 25px 0;
+    box-shadow: 0 2px 8px #00000008;
+}
+
+.historico h3 {
+    margin-bottom: 20px;
+}
+
+.movimentacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 17px 0;
+    border-bottom: 1px solid #eee;
+    flex-wrap: wrap;
+}
+
+.movimentacao p {
+    color: #777;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.movimentacao small {
+    display: block;
+    color: #999;
+    margin-top: 5px;
+}
+
+.botoes-movimentacao {
+    display: flex;
+    gap: 7px;
+}
+
+.botao-editar {
+    border: none;
+    background: #eaf2fc;
+    color: #3984d6;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.botao-editar:hover {
+    background: #d8e8fa;
+}
+
+.botao-excluir {
+    border: none;
+    background: #fdeaea;
+    color: #dc4545;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.botao-excluir:hover {
+    background: #fbd5d5;
+}
+
+
+/* RODAPÉ */
+
+footer {
+    text-align: center;
+    color: #999;
+    margin: 50px auto 20px;
+    font-size: 13px;
+}
+
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 650px) {
+    body {
+        padding: 20px 15px;
+    }
+
+    header h1 {
+        font-size: 25px;
+    }
+
+    .resumo {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .financeiros {
+        grid-template-columns: 1fr;
+    }
+
+    .movimentacao {
+        align-items: flex-start;
+    }
+
+    .botoes-movimentacao {
+        width: 100%;
+    }
+
+    .backup-botoes {
+        flex-direction: column;
+    }
+
+    .backup-botoes button {
+        width: 100%;
+    }
+}
+
+/* ===== RELATÓRIO MENSAL ===== */
+
+.relatorio-mensal {
+    margin: 35px 0;
+}
+
+.descricao-relatorio {
+    color: #777;
+    font-size: 14px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.cards-relatorio {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.card-relatorio {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #00000008;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.card-relatorio span {
+    color: #777;
+    font-size: 14px;
+}
+
+.card-relatorio strong {
+    font-size: 21px;
+    color: #222;
+}
+
+@media (max-width: 650px) {
+    .cards-relatorio {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== EVOLUÇÃO FINANCEIRA ===== */
+
+.evolucao {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 30px 0;
+    box-shadow: 0 2px 8px #00000008;
+}
+
+.evolucao h2 {
+    margin-bottom: 18px;
+}
+
+.legenda-grafico {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+    font-size: 13px;
+    color: #666;
+}
+
+.legenda-grafico span {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.legenda-grafico i {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.legenda-entrada {
+    background: #27ae60;
+}
+
+.legenda-gasto {
+    background: #e74c3c;
+}
+
+.mes-grafico {
+    margin-bottom: 22px;
+}
+
+.nome-mes {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    text-transform: capitalize;
+}
+
+.grupo-barras {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.barra-entrada,
+.barra-gasto {
+    height: 13px;
+    min-width: 0;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.barra-entrada {
+    background: #27ae60;
+}
+
+.barra-gasto {
+    background: #e74c3c;
+}
+
+.valores-grafico {
+    color: #888;
+    font-size: 11px;
+    margin-top: 6px;
+}
+
