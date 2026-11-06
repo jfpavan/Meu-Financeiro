@@ -294,46 +294,69 @@ function calcularResumo(lista) {
 // ATUALIZAR CORES DO SALDO
 // ==========================================
 
+
 function atualizarSaldo(id, valor) {
     const elemento = document.getElementById(id);
 
     elemento.textContent = formatarDinheiro(valor);
 
     elemento.style.color =
-        valor < 0 ? "#e74c3c" : "#27ae60";
+        valor < 0 ? "#DC4545" : "#16875A";
 }
+
 
 
 // ==========================================
 // PAINEL PRINCIPAL
 // ==========================================
 
+
 function atualizarDashboard() {
     const lista = movimentacoesDoMes(movimentacoes);
-    const resumo = calcularResumo(lista);
 
-    document.getElementById("totalEntradas").textContent =
-        formatarDinheiro(resumo.entradas);
-
-    document.getElementById("totalGastos").textContent =
-        formatarDinheiro(resumo.gastos);
-
-    atualizarSaldo("saldoTotal", resumo.saldo);
-
+    // Separar as contas de casa
     const empresa = calcularResumo(
         lista.filter(item => item.area === "empresa")
     );
 
+    // Separar as finanças pessoais
     const joao = calcularResumo(
         lista.filter(item => item.area === "joao")
     );
 
+    // CONTAS DE CASA
+    document.getElementById("entradasEmpresaDashboard").textContent =
+        formatarDinheiro(empresa.entradas);
+
+    document.getElementById("gastosEmpresaDashboard").textContent =
+        formatarDinheiro(empresa.gastos);
+
+    atualizarSaldo("saldoEmpresaDashboard", empresa.saldo);
+
+    // FINANÇAS DO JOÃO
+    document.getElementById("entradasJoaoDashboard").textContent =
+        formatarDinheiro(joao.entradas);
+
+    document.getElementById("gastosJoaoDashboard").textContent =
+        formatarDinheiro(joao.gastos);
+
+    atualizarSaldo("saldoJoaoDashboard", joao.saldo);
+
+    // Cores das entradas e gastos
+    document.getElementById("entradasEmpresaDashboard").style.color = "#16875A";
+    document.getElementById("entradasJoaoDashboard").style.color = "#16875A";
+
+    document.getElementById("gastosEmpresaDashboard").style.color = "#DC4545";
+    document.getElementById("gastosJoaoDashboard").style.color = "#DC4545";
+
+    // Manter os saldos dos cartões principais
     atualizarSaldo("saldoEmpresa", empresa.saldo);
     atualizarSaldo("saldoJoao", joao.saldo);
 
     atualizarRelatorioMensal();
     atualizarGraficoEvolucao();
 }
+
 
 
 // ==========================================
@@ -632,6 +655,9 @@ function atualizarFinanceiro() {
 
     document.getElementById("gastosArea").textContent =
         formatarDinheiro(resumo.gastos);
+
+document.getElementById("entradasArea").style.color = "#16875A";
+document.getElementById("gastosArea").style.color = "#DC4545";
 
     atualizarSaldo("saldoArea", resumo.saldo);
 
@@ -936,89 +962,114 @@ function atualizarRelatorioMensal() {
 }
 
 
-// ==========================================
-// GRÁFICO DE EVOLUÇÃO
-// ==========================================
-
 function atualizarGraficoEvolucao() {
     const grafico = document.getElementById("graficoEvolucao");
+    const seletor = document.getElementById("filtroMesEvolucao");
 
-    if (!grafico) return;
+    if (!grafico || !seletor) return;
+
+    // Iniciar com o mês atual
+    if (!seletor.value) {
+        const hoje = new Date();
+
+        seletor.value =
+            hoje.getFullYear() + "-" +
+            String(hoje.getMonth() + 1).padStart(2, "0");
+    }
+
+    const mesSelecionado = seletor.value;
+
+    const movimentos = movimentacoes.filter(item =>
+        item.data.startsWith(mesSelecionado)
+    );
+
+    const resumo = calcularResumo(movimentos);
+
+    const maiorValor = Math.max(
+        resumo.entradas,
+        resumo.gastos,
+        1
+    );
+
+    const [ano, mes] = mesSelecionado.split("-").map(Number);
+
+    const nomeMes = new Date(ano, mes - 1, 1)
+        .toLocaleDateString("pt-BR", {
+            month: "long",
+            year: "numeric"
+        });
 
     grafico.innerHTML = "";
 
-    const [ano, mes] = filtroMes.value.split("-").map(Number);
+    const titulo = document.createElement("h3");
+    titulo.className = "titulo-mes-evolucao";
+    titulo.textContent =
+        nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
 
-    const meses = [];
+    grafico.appendChild(titulo);
 
-    for (let i = 5; i >= 0; i--) {
-        const data = new Date(ano, mes - 1 - i, 1);
+    function criarIndicador(nome, valor, classe) {
+        const grupo = document.createElement("div");
+        grupo.className = "indicador-evolucao";
 
-        const anoMes =
-            data.getFullYear() + "-" +
-            String(data.getMonth() + 1).padStart(2, "0");
+        const informacoes = document.createElement("div");
+        informacoes.className = "info-evolucao";
 
-        const nomeMes = data.toLocaleDateString("pt-BR", {
-            month: "short",
-            year: "2-digit"
-        });
+        const nomeTexto = document.createElement("span");
+        nomeTexto.textContent = nome;
 
-        const movimentos = movimentacoes.filter(item =>
-            item.data.startsWith(anoMes)
-        );
+        const valorTexto = document.createElement("strong");
+        valorTexto.textContent = formatarDinheiro(valor);
 
-        const resumo = calcularResumo(movimentos);
+        informacoes.appendChild(nomeTexto);
+        informacoes.appendChild(valorTexto);
 
-        meses.push({
-            nome: nomeMes,
-            entradas: resumo.entradas,
-            gastos: resumo.gastos
-        });
+        const fundo = document.createElement("div");
+        fundo.className = "barra-evolucao-fundo";
+
+        const barra = document.createElement("div");
+        barra.className = classe;
+
+        barra.style.width =
+            (valor / maiorValor * 100) + "%";
+
+        fundo.appendChild(barra);
+
+        grupo.appendChild(informacoes);
+        grupo.appendChild(fundo);
+
+        return grupo;
     }
 
-    const maiorValor = Math.max(
-        1,
-        ...meses.flatMap(m => [m.entradas, m.gastos])
+    grafico.appendChild(
+        criarIndicador(
+            "Entradas",
+            resumo.entradas,
+            "barra-evolucao-entrada"
+        )
     );
 
-    meses.forEach(mes => {
-        const linha = document.createElement("div");
-        linha.className = "mes-grafico";
+    grafico.appendChild(
+        criarIndicador(
+            "Gastos",
+            resumo.gastos,
+            "barra-evolucao-gasto"
+        )
+    );
 
-        const titulo = document.createElement("strong");
-        titulo.className = "nome-mes";
-        titulo.textContent = mes.nome;
+    if (movimentos.length === 0) {
+        const mensagem = document.createElement("p");
+        mensagem.className = "mensagem-evolucao";
+        mensagem.textContent =
+            "Nenhuma movimentação registrada neste mês.";
 
-        const barras = document.createElement("div");
-        barras.className = "grupo-barras";
-
-        const entrada = document.createElement("div");
-        entrada.className = "barra-entrada";
-        entrada.style.width =
-            (mes.entradas / maiorValor * 100) + "%";
-
-        const gasto = document.createElement("div");
-        gasto.className = "barra-gasto";
-        gasto.style.width =
-            (mes.gastos / maiorValor * 100) + "%";
-
-        const valores = document.createElement("div");
-        valores.className = "valores-grafico";
-
-        valores.textContent =
-            "Entradas: " + formatarDinheiro(mes.entradas) +
-            " | Gastos: " + formatarDinheiro(mes.gastos);
-
-        barras.appendChild(entrada);
-        barras.appendChild(gasto);
-
-        linha.appendChild(titulo);
-        linha.appendChild(barras);
-        linha.appendChild(valores);
-
-        grafico.appendChild(linha);
-    });
+        grafico.appendChild(mensagem);
+    }
 }
+
+// Atualizar o gráfico quando escolher outro mês
+document.getElementById("filtroMesEvolucao")
+    .addEventListener("change", atualizarGraficoEvolucao);
 
 
 // ==========================================

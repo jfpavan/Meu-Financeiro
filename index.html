@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,79 +9,145 @@
 </head>
 <body>
 
-    <header>
-        <h1>Meu Financeiro</h1>
-        <p>Controle suas finanças de forma simples.</p>
-    </header>
+    <header class="cabecalho-principal">
+    <div class="marca-financeiro">
+        <div class="marca-icone">R$</div>
+        <div>
+            <h1>Financeiro <strong>PAVAN</strong></h1>
+            <p>Gestão financeira familiar</p>
+        </div>
+    </div>
+</header>
 
     <main>
 
-        <!-- TELA DE LOGIN -->
-        <section id="telaLogin" class="tela-login">
+        
+<!-- TELA DE LOGIN -->
+<section id="telaLogin" class="tela-login">
 
-            <h2>Acesse sua conta</h2>
-            <p>Entre para acessar suas finanças.</p>
+    <div class="login-marca">
+        <div class="login-icone">₽</div>
+        <span>FINANCEIRO <strong>PAVAN</strong></span>
+    </div>
 
-            <form onsubmit="entrar(event)">
+    <div class="login-conteudo">
 
-                <label for="emailLogin">E-mail</label>
-                <input
-                    type="email"
-                    id="emailLogin"
-                    placeholder="Seu e-mail"
-                    required
-                >
+        <span class="login-etiqueta">GESTÃO FINANCEIRA</span>
 
-                <label for="senhaLogin">Senha</label>
-                <input
-                    type="password"
-                    id="senhaLogin"
-                    placeholder="Sua senha"
-                    required
-                >
+        <h2>Bem-vindo ao<br><strong>Financeiro PAVAN</strong></h2>
 
-                <button type="submit" id="botaoLogin">
-                    Entrar
-                </button>
+        <p class="login-descricao">
+            Seu dinheiro organizado, suas decisões mais inteligentes.
+        </p>
 
-                <p id="mensagemLogin"></p>
+        <form onsubmit="entrar(event)">
 
-            </form>
+            <label for="emailLogin">E-mail</label>
+            <input
+                type="email"
+                id="emailLogin"
+                placeholder="Digite seu e-mail"
+                required
+            >
 
-        </section>
+            <label for="senhaLogin">Senha</label>
+            <input
+                type="password"
+                id="senhaLogin"
+                placeholder="Digite sua senha"
+                required
+            >
+
+            <button type="submit" id="botaoLogin">
+                Entrar na minha conta
+            </button>
+
+            <p id="mensagemLogin"></p>
+
+        </form>
+
+    </div>
+
+    <div class="login-rodape">
+        <span>ACESSO SEGURO</span>
+        <span>FINANCEIRO PAVAN © 2026</span>
+    </div>
+
+</section>
+
 
 
         <!-- SISTEMA FINANCEIRO -->
         <div id="appContainer" style="display: none;">
 
-            <div class="area-usuario">
-                <span id="usuarioLogado"></span>
-                <button onclick="sair()" class="botao-sair">
-                    Sair
-                </button>
-            </div>
+          <div class="area-usuario">
+    <div class="dados-usuario">
+        <div class="usuario-icone">👤</div>
+        <div class="usuario-informacoes">
+            <span class="usuario-legenda">CONECTADO COMO</span>
+            <strong id="usuarioLogado"></strong>
+        </div>
+    </div>
+
+    <button onclick="sair()" class="botao-sair">
+        <span>↪</span> Sair da conta
+    </button>
+</div>
 
             <!-- PAINEL PRINCIPAL -->
             <section id="dashboard">
 
                 <h2>Visão geral</h2>
 
-                <div class="resumo">
-                    <div class="card-resumo">
-                        <h3>Entradas</h3>
-                        <p id="totalEntradas">R$ 0,00</p>
-                    </div>
 
-                    <div class="card-resumo">
-                        <h3>Gastos</h3>
-                        <p id="totalGastos">R$ 0,00</p>
-                    </div>
+<div class="resumos-separados">
 
-                    <div class="card-resumo">
-                        <h3>Saldo</h3>
-                        <p id="saldoTotal">R$ 0,00</p>
-                    </div>
-                </div>
+    <!-- CONTAS DE CASA -->
+    <section class="grupo-resumo">
+        <h3>🏠 Contas de casa</h3>
+
+        <div class="resumo-itens">
+            <div class="card-resumo">
+                <h3>Entradas</h3>
+                <p id="entradasEmpresaDashboard">R$ 0,00</p>
+            </div>
+
+            <div class="card-resumo">
+                <h3>Gastos</h3>
+                <p id="gastosEmpresaDashboard">R$ 0,00</p>
+            </div>
+
+            <div class="card-resumo">
+                <h3>Saldo</h3>
+                <p id="saldoEmpresaDashboard">R$ 0,00</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINANÇAS DO JOÃO -->
+    <section class="grupo-resumo">
+        <h3>👤 Finanças do João</h3>
+
+        <div class="resumo-itens">
+            <div class="card-resumo">
+                <h3>Entradas</h3>
+                <p id="entradasJoaoDashboard">R$ 0,00</p>
+            </div>
+
+            <div class="card-resumo">
+                <h3>Gastos</h3>
+                <p id="gastosJoaoDashboard">R$ 0,00</p>
+            </div>
+
+            <div class="card-resumo">
+                <h3>Saldo</h3>
+                <p id="saldoJoaoDashboard">R$ 0,00</p>
+            </div>
+        </div>
+    </section>
+
+</div>
+
 
                 <div class="mes">
                     <label for="filtroMes">Consultar mês:</label>
@@ -92,8 +159,8 @@
                 <div class="financeiros">
 
                     <div class="card-financeiro" onclick="abrirFinanceiro('empresa')">
-                        <h3>Casa</h3>
-                        <p>Contas de casa</p>
+                        <h3>Empresa</h3>
+                        <p>DRP Corretora</p>
                         <strong id="saldoEmpresa">R$ 0,00</strong>
                     </div>
 
@@ -140,23 +207,26 @@
 
                 </section>
 
-                <!-- EVOLUÇÃO FINANCEIRA -->
-                <section class="evolucao">
+<!-- EVOLUÇÃO FINANCEIRA -->
+<section class="evolucao">
 
-                    <h2>Evolução dos últimos 6 meses</h2>
+    <div class="cabecalho-evolucao">
+        <div>
+            <h2>Evolução financeira</h2>
+            <p class="descricao-relatorio">
+                Consulte suas entradas e gastos por mês.
+            </p>
+        </div>
 
-                    <p class="descricao-relatorio">
-                        Compare suas entradas e gastos mês a mês.
-                    </p>
+        <div class="seletor-evolucao">
+            <label for="filtroMesEvolucao">Escolher mês</label>
+            <input type="month" id="filtroMesEvolucao">
+        </div>
+    </div>
 
-                    <div class="legenda-grafico">
-                        <span><i class="legenda-entrada"></i> Entradas</span>
-                        <span><i class="legenda-gasto"></i> Gastos</span>
-                    </div>
+    <div id="graficoEvolucao"></div>
 
-                    <div id="graficoEvolucao"></div>
-
-                </section>
+</section>
 
                 <!-- BACKUP -->
                 <div class="backup">
